@@ -1,0 +1,402 @@
+#include "pch.h"
+#include <iostream>
+#include <iomanip>
+#include <limits>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include <vector>
+using namespace std;
+
+//Functions
+void fightSelection();
+void battlescreen();
+char menu();
+int random();
+void banditFight();
+void knightDrawing();
+void displayInv();
+void useItem();
+void bossDrop();
+//Menu Functions
+int basicAttack();
+int specialAttack();
+//Enemy Attacks
+int banditAttack();
+
+//Variables
+int goldGot;
+int woodGot;
+int wheatGot;
+bool banditFought = false;
+bool entFought = false;
+bool dragonFought = false;
+bool darkKnightFought = false;
+bool demonLordFought = false;
+int attackDamage;
+int level = 1;
+int banditHP = 30;
+string playerName;
+string currentMonster;
+int damageDelt;
+int hpremaining;
+
+//Arrays for Attacking
+double basicAttm[5] = { 1.0, 1.5, 2.0, 2.5, 3}; //Really just all sword attack multipliers based on level. Index 0 being level 1
+
+//Items
+vector<int> inv(0);
+
+//Classes
+class Hero
+{
+private:
+	int hP;
+	int mP;
+public:
+	int gethP() { return hP; };
+	int getmP() { return mP; };
+	void sethP(int hp);
+	void setmP(int mp);
+	void useItem(int item);
+
+	Hero(int hp, int mp); //Constructor
+	Hero(); //default constructor
+};
+
+//Setting Hero HP
+void Hero::sethP(int hp)
+{
+	hP = hp;
+}
+//Setting Hero MP
+void Hero::setmP(int mp)
+{
+	mP = mp;
+}
+//Restore hp or mp during a fight
+void Hero::useItem(int item)
+{
+	switch (item)
+	{
+	case 1: //small potion
+		hP += 10;
+		break;
+	case 2: //large potion
+		hP += 15;
+		break;
+	}
+}
+//Constrcutor
+Hero::Hero(int hp, int mp)
+{
+	hP = hp;
+	mP = mp;
+}
+//Deafult Constructor
+Hero::Hero()
+{
+	hP = 0;
+	mP = 0;
+}
+Hero Warrior(10, 5);
+
+int main()
+{
+	srand(time(0));
+	cout << "\n\n What is Your Character's Name?: ";
+	cin >> playerName;
+	char selection;
+	cout << "\n\n\n\n\n\n \t Welcome to the Battle Arena " << playerName << "! \n";
+	cout << "\t You are tasked with battling all types of monsters \n";
+	cout << "\t Every monster has unique drops, so the order you fight these monsters has an impact on your results!";
+	cout << "\n\n What Class Type Will You Choose? ";
+	cout << "\n\n 1. Warrior " << endl;
+	cout << "\n 2. Mage **Currently Unavailible**" << endl; //Was taking too much time so for now only 1 option
+	cout << "\n 3. Archer **Currently Unavailible**" << endl;
+	cout << "\n 4. Quit " << endl;
+	cout << "\n Current Selection ....... ";
+	cin >> selection;
+	switch (static_cast<char> (selection))
+	{
+	case '1':
+		inv.push_back(1);
+		fightSelection();
+		break;
+	case '4':
+		system("Pause");
+		exit(0);
+		break;
+	default:
+		cout << "\n\n\n \t\t\t Please choose a class ";
+		cout << " \n\n ";
+		cout << " \t\t\t PRESS ENTER TO CONTINUE ";
+		cin.ignore(std::numeric_limits<streamsize>::max(), '\n');
+		cin.get();
+		main();
+	}
+	fightSelection();
+	return 0;
+};
+
+//Generates random number between 0-10 I think
+int random() {
+	return(rand() % 10);
+}
+void fightSelection() //Choosing which monster to fight
+{
+	char selection;
+	cout << "\n\n\n\n\n\n\n Choose the Monster You Wish to Fight ";
+	cout << "\n\n\n 1. Bandit (Easy)" << endl;
+	cout << "\n 2. Tree Ent (Medium)" << endl;
+	cout << "\n 3. Dragon (Hard)" << endl;
+	cout << "\n 4. Dark Knight (Hard)" << endl;
+	cout << "\n 5. Demon Lord (Very Difficult) " << endl;
+	cout << "\n Current Selection ....... ";
+	cin >> selection;
+	switch (static_cast<char> (selection))
+	{
+	case '1':
+		if (!banditFought) //Checks if bandit was fought yet
+		{
+			cout << "\n\n\n\t *YOU ENTER BATTLE WITH THE BANDIT*\n";
+			currentMonster = "Bandit";
+			banditFight();
+		}
+		else
+		{
+			cout << "\n\n You have already fought this monster" << endl;
+			fightSelection();
+		}
+	case '2':
+		if (!entFought)
+		{
+			cout << "\n\n\n\t *YOU ENTER BATTLE WITH THE ENT*\n";
+			currentMonster = "Ent";
+			banditFight();
+		}
+		else
+		{
+			cout << "\n\n You have already fought this monster" << endl;
+			fightSelection();
+		}
+	case '3':
+		if (!dragonFought)
+		{
+			cout << "\n\n\n\t *YOU ENTER BATTLE WITH THE DRAGON*\n";
+			currentMonster = "Dragon";
+			banditFight();
+		}
+		else
+		{
+			cout << "\n\n You have already fought this monster" << endl;
+			fightSelection();
+		}
+	case '4':
+		if (!darkKnightFought)
+		{
+			cout << "\n\n\n\t *YOU ENTER BATTLE WITH THE DARK KNIGHT*\n";
+			currentMonster = "Dark Knight";
+			banditFight();
+		}
+		else
+		{
+			cout << "\n\n You have already fought this monster" << endl;
+			fightSelection();
+		}
+	case '5':
+		cout << "\n\n\n\t *YOU ENTER BATTLE WITH THE DEMON LORD*\n";
+		cout << "\t *PREPARE TO DIE*\n";
+		banditFight();
+	default:
+		cout << "\n\n\n \t\t\t INVALID CHOICE - CHOOSE FROM 1 - 5 ";
+		cout << " \n\n ";
+		cout << " \t\t\t PRESS ENTER TO CONTINUE ";
+		cin.ignore(std::numeric_limits<streamsize>::max(), '\n');
+		cin.get();
+		fightSelection();
+	}
+}
+void banditFight()
+{
+	int banditHP = 30;
+	battlescreen();
+	while (banditHP > 0) //Loop that will activate turn based battle, where bandit attacks after you every time
+	{
+		int selection = menu(); //Just displays attack options
+		switch (static_cast<char> (selection))
+		{
+		case '1':
+			basicAttack();
+			system("Pause");
+			break;
+		case '2':
+			if (Warrior.getmP() >= 5) //Checking if Hero has enought mp to initiate special attack
+				specialAttack();
+			else
+			{
+				cout << "\n\t*You don't have enough mp!*";
+				system("Pause");
+				banditFight();
+			}
+			system("Pause");
+			break;
+		case '3':
+			displayInv();
+			useItem();
+
+		default:
+			cout << "Please choose an option";
+			banditFight();
+			break;
+		}
+		banditHP -= attackDamage;
+		damageDelt = banditAttack();
+		if (banditHP > 0) //Bandit is still alive
+		{
+			cout << "\n\n \t The bandit has: " << banditHP << " HP remaining" << endl;
+			cout << "\n\t *The bandit attacks!* \n\n \t *You take: " << damageDelt << " Damage*" << endl;
+			hpremaining = Warrior.gethP() - damageDelt;
+			Warrior.sethP(hpremaining);
+			system("Pause");
+			battlescreen();
+		}
+	}
+	cout << "\n\n\t *You have killed the bandit!*" << endl; //Loop ends when bandit dies and below code executes
+	system("Pause");
+	//Level Up
+	level += 1;
+	cout << "\n\n\t *You level up*\n\t *You are now level " << level;
+	cout << "\n\nHP +10\nMP +5\nDamage+" << endl;
+	Warrior.sethP(20);
+	Warrior.setmP(10);
+	banditFought = true;
+	fightSelection();
+}
+char menu()
+{
+	cout << "What would you like to do?" << endl;
+	char selection;
+	cout << "\n\n 1. Attack " << endl;
+	cout << "\n 2. Special Attack (Cost 5 mp)" << endl;
+	cout << "\n 3. Items " << endl;
+	cout << "\n Current Selection ....... ";
+	cin >> selection;
+	return selection; //takes selection and puts it into the switch statement in the actual monster fight funtion
+}
+void knightDrawing() //For fun
+{
+	cout << "   / \\ " << endl;
+	cout << "  /   \\" << endl;
+	cout << " |     |" << endl;
+	cout << " |     |" << endl;
+	cout << " |     |" << endl;
+	cout << " |     |" << endl;
+	cout << " |     |" << endl;
+	cout << " |     |" << endl;
+	cout << " |_____|" << endl;
+	cout << "/_______\\" << endl;
+	cout << "   |+|" << endl;
+	cout << "   |+|" << endl;
+	cout << "   |+|" << endl;
+}
+void battlescreen() //Shows Player name, current hp, and current mp
+{
+	cout << "\n\n -___" << playerName << "___-";
+	cout << "\n\n HP: " << Warrior.gethP() << endl;
+	cout << " MP: " << Warrior.getmP() << endl;
+	cout << "_______________________________\n\n\n";
+}
+int banditAttack() //In the future would probably be for all monsters, where each monster get's their own array/vector
+{
+	int banditDamage = (rand() % 3);
+	int banditArray[3] = { 1, 2, 3 };
+	return banditArray[banditDamage];
+
+}
+int basicAttack() //For scaling and dealing basic attack damage
+{
+	cout << "\n\n\n\n\t *You attack the " << currentMonster << " with your sword!*" << endl;
+	attackDamage = random() * basicAttm[level - 1] + 1;
+	cout << "\n\n\t *You deal " << attackDamage << " damage to the " << currentMonster << "*\n\n";
+	return attackDamage;
+}
+int specialAttack()//Riskier move but deals more damage
+{
+	int mpcost = Warrior.getmP() - 5;
+	Warrior.setmP(mpcost);
+	cout << "\n\t *You grab your sword with both hands and hastily attack!*" << endl;
+	attackDamage = (random() * basicAttm[level -1]) + 5; //+5 attack compared to basic attack
+	if (attackDamage > 5) //If Hero deals more than 5 damage special move hits
+	{
+		cout << "\n\n\t *You deal " << attackDamage << " damage to the " << currentMonster << "*\n\n";
+		return attackDamage;
+	}
+	else //Hero misses if he would have delt < 5 damage
+	{
+		cout << "\n\t *You missed!*\n";
+		attackDamage = 0;
+		return attackDamage;
+	}
+	
+}
+void displayInv() //For loop that runs through the vector and displays inv with numbers for vector index + 1
+{
+	cout << "\n\n\t *ITEMS*\n";
+	for (int i = 0; i < inv.size(); i++)
+	{
+		if (inv[i] = 0) //Hero has nothing in his inv vector
+			cout << "Nothing";
+		else if (inv[i] = 1)//If there is a 1 in the vector it corresponds to small hp potion
+			cout << "\n" << i + 1 << ". Small hp Potion (Restores 10 hp)";
+		else if (inv[i] = 2)
+			cout << "\n" << i + 1 << ". Large hp Potion (Resotes 15 hp)";
+	}
+	cout << "\n6. Return" << endl; //6 Is return but any input other than an inv option will also return
+	cout << "\n Current Selection ....... ";
+}
+void useItem() //Actually does the effect of the item and removes it from inv. Does not actually work correctly
+{
+	char selection;
+	cin >> selection;
+	switch (static_cast<char> (selection))
+	{
+	case '1':
+		if (inv[0] = 1)
+		{
+			Warrior.useItem(1);
+			cout << "\n\t *You use a small hp potion*\n\n" << endl;
+			inv.erase(inv.begin());
+		}
+		else if (inv[0] = 2)
+		{
+			Warrior.useItem(2);
+			cout << "\n\t *You use a large hp potion*\n\n" << endl;
+			inv.erase(inv.begin());
+		}
+		else
+			cout << "\n\t There is nothing to use";
+		break;
+	case '2':
+		if (inv[1] = 1)
+		{
+			Warrior.useItem(1);
+			cout << "\n\t *You use a small hp potion*" << endl;
+			inv.erase(inv.begin() + 1);
+		}
+		else if (inv[1] = 2)
+		{
+			Warrior.useItem(2);
+			cout << "\n\t *You use a large hp potion*" << endl;
+			inv.erase(inv.begin() + 1);
+		}
+		else
+			cout << "\n\t You do not have that";
+		break;
+	default:
+		break;
+	}
+}
+void bossDrop() //Each boss will drop items that go directly into user inv
+{
+}
